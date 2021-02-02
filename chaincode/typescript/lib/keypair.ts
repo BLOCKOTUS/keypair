@@ -4,9 +4,10 @@
 
 'use strict';
 
-import { Context, Contract } from 'fabric-contract-api';
+import { Context } from 'fabric-contract-api';
+import { BlockotusContract } from 'hyperledger-fabric-chaincode-helper';
 
-export class Keypair extends Contract {
+export class Keypair extends BlockotusContract {
 
     public async initLedger() {
         console.log('initLedger');
@@ -25,7 +26,7 @@ export class Keypair extends Contract {
         const params = args.params;
         this.validateParams(params, 4);
 
-        const id = await this.getCreatorId(ctx);
+        const id = this.getUniqueClientId(ctx);
         const sharedKeyPairId = `${params[3]}||${id}||${params[1]}`;
 
         // check if the keyapir already exists or not
@@ -69,7 +70,7 @@ export class Keypair extends Contract {
         const params = args.params;
         this.validateParams(params, 1);
 
-        const id = await this.getCreatorId(ctx);
+        const id = this.getUniqueClientId(ctx);
         const sharedKeyPairId = params[0];
 
         // retrieve object from the ledger
@@ -97,23 +98,4 @@ export class Keypair extends Contract {
         if (params.length !== count) { throw new Error(`Incorrect number of arguments. Expecting ${count}. Args: ${JSON.stringify(params)}`); }
     }
 
-    /**
-     * Get the creatorId (transaction submitter unique id) from the Helper organ.
-     */
-    private async getCreatorId(ctx: Context) {
-        const rawId = await ctx.stub.invokeChaincode('helper', ['getCreatorId'], 'mychannel');
-        if (rawId.status !== 200) { throw new Error(rawId.message); }
-
-        return rawId.payload.toString();
-    }
-
-    /**
-     * Get the timestamp from the Helper organ.
-     */
-    private async getTimestamp(ctx: Context) {
-        const rawTs = await ctx.stub.invokeChaincode('helper', ['getTimestamp'], 'mychannel');
-        if (rawTs.status !== 200) { throw new Error(rawTs.message); }
-
-        return rawTs.payload.toString();
-    }
 }
