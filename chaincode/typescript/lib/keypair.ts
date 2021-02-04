@@ -9,8 +9,21 @@ import { BlockotusContract } from 'hyperledger-fabric-chaincode-helper';
 
 export class Keypair extends BlockotusContract {
 
+    constructor(...args) {
+        super(...args);
+    }
+
     public async initLedger() {
         console.log('initLedger');
+    }
+
+    /**
+     * Cross-contract invokeChaincode() does not support Parent Contract method as far as I know.
+     * This is why we duplicate the method here.
+     * Because the method is called from Did contract https://github.com/BLOCKOTUS/did
+     */
+    public async did(ctx: Context, subject: string, method: string, data: string): Promise<string> {
+        return this.didRequest(ctx, subject, method, data);
     }
 
     /**
@@ -73,12 +86,8 @@ export class Keypair extends BlockotusContract {
         const id = this.getUniqueClientId(ctx);
         const sharedKeyPairId = params[0];
 
-        // retrieve object from the ledger
-        const rawKeypairObject = await ctx.stub.getState(sharedKeyPairId);
-        if (rawKeypairObject.length === 0) { throw new Error(`${sharedKeyPairId} is not valid.`); }
-
-        // parse the object
-        const stringKeypairObject = rawKeypairObject.toString();
+        // retrieve keypair object
+        const stringKeypairObject = await this.didGet(ctx, sharedKeyPairId);
         const keypairObject = JSON.parse(stringKeypairObject);
 
         // look for the keypair shared with the user
