@@ -35,9 +35,7 @@ export class Keypair extends BlockotusContract {
      * @param type = 'job'
      */
     public async createSharedKeypair(ctx: Context) {
-        const args = ctx.stub.getFunctionAndParameters();
-        const params = args.params;
-        this.validateParams(params, 4);
+        const params = this.getParams(ctx, { length: 4 });
 
         const id = this.getUniqueClientId(ctx);
         const sharedKeyPairId = `${params[3]}||${id}||${params[1]}`;
@@ -79,9 +77,7 @@ export class Keypair extends BlockotusContract {
      * @param keypairId
      */
     public async getKeypair(ctx: Context) {
-        const args = ctx.stub.getFunctionAndParameters();
-        const params = args.params;
-        this.validateParams(params, 1);
+        const params = this.getParams(ctx, { length: 1 });
 
         const id = this.getUniqueClientId(ctx);
         const sharedKeyPairId = params[0];
@@ -94,17 +90,6 @@ export class Keypair extends BlockotusContract {
         if (keypairObject[id] === undefined) { throw new Error(`${sharedKeyPairId} is not shared with you.`); }
 
         return keypairObject[id].keypair;
-    }
-
-    /**
-     * Validate the params received as arguments by a public functions.
-     * Params are stored in the Context.
-     * 
-     * @param {string[]} params params received by a pubic function
-     * @param {number} count number of params expected
-     */
-    private validateParams(params, count) {
-        if (params.length !== count) { throw new Error(`Incorrect number of arguments. Expecting ${count}. Args: ${JSON.stringify(params)}`); }
     }
 
 }
