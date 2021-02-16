@@ -41,34 +41,32 @@ export class Keypair extends BlockotusContract {
         const sharedKeyPairId = `${params[3]}||${id}||${params[1]}`;
 
         // check if the keyapir already exists or not
-        const existing = await ctx.stub.getState(sharedKeyPairId);
-        if (!existing.toString()) {
-            const sharedWith = JSON.parse(params[0]);
-            const value = {};
-            value[id] = {keypair: params[2], isCreator: true};
+        const existing = await this.exists(ctx, sharedKeyPairId);
+        if (existing) { throw new Error(`${sharedKeyPairId} already exists.`); }
 
-            // prepare an object containing the encrypted keypair version of each user who was given a copy
-            for (const eUserId in sharedWith) {
-                if (sharedWith.hasOwnProperty(eUserId)) {
-                    value[eUserId] = {
-                        isCreator: false,
-                        keypair: sharedWith[eUserId].keypair,
-                    };
-                }
+        const sharedWith = JSON.parse(params[0]);
+        const value = {};
+        value[id] = {keypair: params[2], isCreator: true};
+
+        // prepare an object containing the encrypted keypair version of each user who was given a copy
+        for (const eUserId in sharedWith) {
+            if (sharedWith.hasOwnProperty(eUserId)) {
+                value[eUserId] = {
+                    isCreator: false,
+                    keypair: sharedWith[eUserId].keypair,
+                };
             }
-
-            // put the object in the ledger
-            await ctx.stub.putState(sharedKeyPairId, Buffer.from(JSON.stringify(value)));
-
-            // put the indexes
-            const compositeKey = await ctx.stub.createCompositeKey('id~groupId~type', [id, params[1], params[3]]);
-            const compositeKeyReverse = await ctx.stub.createCompositeKey('groupId~id~type', [params[1], id, params[3]]);
-            await ctx.stub.putState(compositeKey, Buffer.from('\u0000'));
-            await ctx.stub.putState(compositeKeyReverse, Buffer.from('\u0000'));
-            return;
-        } else {
-            throw new Error(`${sharedKeyPairId} is already taken.`);
         }
+
+        // put the object in the ledger
+        await ctx.stub.putState(sharedKeyPairId, Buffer.from(JSON.stringify(value)));
+
+        // put the indexes
+        const compositeKey = await ctx.stub.createCompositeKey('id~groupId~type', [id, params[1], params[3]]);
+        const compositeKeyReverse = await ctx.stub.createCompositeKey('groupId~id~type', [params[1], id, params[3]]);
+        await ctx.stub.putState(compositeKey, Buffer.from('\u0000'));
+        await ctx.stub.putState(compositeKeyReverse, Buffer.from('\u0000'));
+        return;
     }
 
     /**
