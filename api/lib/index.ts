@@ -22,7 +22,7 @@ export const share = async ({
 
     // get contract, submit transaction and disconnect
     const {contract, gateway} = await
-      getContractAndGateway({username: user.username, chaincode: 'keypair', contract: 'Keypair'})
+      getContractAndGateway({user, chaincode: 'keypair', contract: 'Keypair'})
         .catch(reject);
 
     if (!contract || !gateway) { return; }
@@ -56,7 +56,7 @@ export const get = async ({
 
     // get contract, submit transaction and disconnect
     const {contract, gateway} = await
-      getContractAndGateway({username: user.username, chaincode: 'keypair', contract: 'Keypair'})
+      getContractAndGateway({user, chaincode: 'keypair', contract: 'Keypair'})
         .catch(reject);
 
     if (!contract || !gateway) { return; }

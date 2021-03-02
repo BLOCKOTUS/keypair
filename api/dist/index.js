@@ -59,7 +59,7 @@ var share = /*#__PURE__*/function () {
 
                         _context.next = 4;
                         return (0, _index.getContractAndGateway)({
-                          username: user.username,
+                          user: user,
                           chaincode: 'keypair',
                           contract: 'Keypair'
                         })["catch"](reject);
@@ -154,7 +154,7 @@ var get = /*#__PURE__*/function () {
 
                         _context3.next = 4;
                         return (0, _index.getContractAndGateway)({
-                          username: user.username,
+                          user: user,
                           chaincode: 'keypair',
                           contract: 'Keypair'
                         })["catch"](reject);
