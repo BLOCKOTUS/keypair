@@ -28,7 +28,7 @@ export class Keypair extends BlockotusContract {
 
     /**
      * Store a shared keypair.
-     * 
+     *
      * @param sharedWith
      * @param groupId
      * @param myEncryptedKeyPair
@@ -71,7 +71,7 @@ export class Keypair extends BlockotusContract {
 
     /**
      * Get a shared keypair.
-     * 
+     *
      * @param keypairId
      */
     public async getKeypair(ctx: Context) {
